@@ -10,11 +10,15 @@ def parseIssuesToCSV(url):
         raise ApiError('GET /tasks/ {}'.format(resp.status_code))
 
     #print(json.dumps(resp.json(), indent=4))
+
     priority = getPriority(resp.json())
-    print(priority)
+    #print(priority)
 
     timeToFix = getTimeToFix(resp.json())
-    print(timeToFix)
+    #print(timeToFix)
+
+    numberOfComments = getNumberOfComments(resp.json())
+    print(numberOfComments)
 
 def getPriority(respJson):
     return respJson["fields"]["priority"]["name"]
@@ -27,6 +31,12 @@ def getTimeToFix(respJson):
     timeToFixInDays = timeToFix / timedelta(days=1)
 
     return timeToFixInDays
+
+def getNumberOfComments(respJson):
+    comments = respJson["fields"]["comment"]["comments"]
+    return len(comments)
+
+
 
 url = "https://issues.apache.org/jira/rest/api/latest/issue/ACCUMULO-1?"
 parseIssuesToCSV(url)
