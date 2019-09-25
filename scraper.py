@@ -2,16 +2,28 @@ import requests
 from dateutil.parser import parse
 from datetime import timedelta
 
-def writeIssueToFile(file, i):
-    resp = requests.get(url + str(i))
+class IssueNotExistingError(Exception):
+    """Raised when the issue does not exist in Jira"""
+    pass
+
+def getJiraJSON(url):
+    resp = requests.get(url)
 
     if resp.status_code != 200:
-        return
+        raise IssueNotExistingError
 
-    priority = getPriority(resp.json())
-    timeToFix = getTimeToFix(resp.json())
-    numberOfComments = getNumberOfComments(resp.json())
-    numberOfCommenters = getNumberOfCommenters(resp.json())
+    return resp.json()
+
+def writeIssueToFile(file, i):
+    try:
+        json = getJiraJSON(url + str(i))
+    except IssueNotExistingError:
+        raise
+
+    priority = getPriority(json)
+    timeToFix = getTimeToFix(json)
+    numberOfComments = getNumberOfComments(json)
+    numberOfCommenters = getNumberOfCommenters(json)
 
     print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
@@ -19,9 +31,9 @@ def writeAllIssuesToFile(file):
     i = 1
     while (True):
         try:
-            writeIssueToFile(file, i)
-        except BaseException:
-            break
+            writeIssueToFile(file, 5000)
+        except IssueNotExistingError:
+            return
 
         i += 1
 
@@ -29,6 +41,7 @@ def parseIssuesToCSV(url):
     f = open('jira_data.csv')
     print("id,severity,days_to_close,num_comments,num_commenters\n")
 
+    #writeIssueToFile(f, 5000)
     writeAllIssuesToFile(f)
 
     f.close()
