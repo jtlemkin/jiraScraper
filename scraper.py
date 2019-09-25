@@ -1,6 +1,7 @@
 import requests
 from dateutil.parser import parse
 from datetime import timedelta
+import json
 
 class IssueNotExistingError(Exception):
     """Raised when the issue does not exist in Jira"""
@@ -12,37 +13,38 @@ def getJiraJSON(url):
     if resp.status_code != 200:
         raise IssueNotExistingError
 
+    #print(json.dumps(resp.json(), indent=4))
+
     return resp.json()
 
-def writeIssueToFile(file, i):
+def writeIssueToFile(file, url, i):
     try:
-        json = getJiraJSON(url + str(i))
+        jiraJson = getJiraJSON(url + str(i))
     except IssueNotExistingError:
         raise
 
-    priority = getPriority(json)
-    timeToFix = getTimeToFix(json)
-    numberOfComments = getNumberOfComments(json)
-    numberOfCommenters = getNumberOfCommenters(json)
+    priority = getPriority(jiraJson)
+    timeToFix = getTimeToFix(jiraJson)
+    numberOfComments = getNumberOfComments(jiraJson)
+    numberOfCommenters = getNumberOfCommenters(jiraJson)
 
     print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
-def writeAllIssuesToFile(file):
+def writeAllIssuesToFile(file, base_url):
     i = 1
     while (True):
         try:
-            writeIssueToFile(file, 5000)
+            writeIssueToFile(file, base_url, i)
         except IssueNotExistingError:
             return
 
         i += 1
 
-def parseIssuesToCSV(url):
+def parseIssuesToCSV(base_url):
     f = open('jira_data.csv')
     print("id,severity,days_to_close,num_comments,num_commenters\n")
 
-    #writeIssueToFile(f, 5000)
-    writeAllIssuesToFile(f)
+    writeAllIssuesToFile(f, base_url)
 
     f.close()
 
@@ -50,13 +52,17 @@ def getPriority(respJson):
     return respJson["fields"]["priority"]["name"]
 
 def getTimeToFix(respJson):
-    resolutionDate = parse(respJson["fields"]["resolutiondate"])
-    creationDate = parse(respJson["fields"]["created"])
+    if respJson["fields"]["status"]["name"] == "Resolved":
+        resolutionDate = parse(respJson["fields"]["resolutiondate"])
+        creationDate = parse(respJson["fields"]["created"])
 
-    timeToFix = resolutionDate - creationDate
-    timeToFixInDays = timeToFix / timedelta(days=1)
+        timeToFix = resolutionDate - creationDate
+        timeToFixInDays = timeToFix / timedelta(days=1)
 
-    return timeToFixInDays
+        return timeToFixInDays
+    else:
+        #-1 indicates that the issue has not been fixed
+        return -1
 
 def getNumberOfComments(respJson):
     comments = respJson["fields"]["comment"]["comments"]
