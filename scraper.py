@@ -28,7 +28,7 @@ def writeIssueToFile(file, url, i):
     numberOfComments = getNumberOfComments(jiraJson)
     numberOfCommenters = getNumberOfCommenters(jiraJson)
 
-    print("{0},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
+    file.write("{0},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
 def writeAllIssuesToFile(file, base_url):
     i = 1
@@ -41,12 +41,13 @@ def writeAllIssuesToFile(file, base_url):
         i += 1
 
 def parseIssuesToCSV(base_url):
-    f = open('jira_data.csv')
-    print("id,severity,days_to_close,num_comments,num_commenters\n")
+    try:
+        f = open('jira_data.csv', "w+")
+        f.write("id,severity,days_to_close,num_comments,num_commenters\n")
 
-    writeAllIssuesToFile(f, base_url)
-
-    f.close()
+        writeAllIssuesToFile(f, base_url)
+    finally:
+        f.close()
 
 def getPriority(respJson):
     return respJson["fields"]["priority"]["name"]
