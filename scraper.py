@@ -1,28 +1,28 @@
-import json
 import requests
 from dateutil.parser import parse
 from datetime import timedelta
-import csv
 
 def parseIssuesToCSV(url):
-    resp = requests.get(url)
+    f = open('jira_data.csv')
+    print("id,severity,days_to_close,num_comments,num_commenters\n")
 
-    if resp.status_code != 200:
-        raise ApiError('GET /tasks/ {}'.format(resp.status_code))
+    i = 1
+    while(True):
+        resp = requests.get(url + str(i))
 
-    #print(json.dumps(resp.json(), indent=4))
+        if resp.status_code != 200:
+            break
 
-    priority = getPriority(resp.json())
-    print(priority)
+        priority = getPriority(resp.json())
+        timeToFix = getTimeToFix(resp.json())
+        numberOfComments = getNumberOfComments(resp.json())
+        numberOfCommenters = getNumberOfCommenters(resp.json())
 
-    timeToFix = getTimeToFix(resp.json())
-    print(timeToFix)
+        print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
-    numberOfComments = getNumberOfComments(resp.json())
-    print(numberOfComments)
+        i += 1
 
-    numberOfCommenters = getNumberOfCommenters(resp.json())
-    print(numberOfCommenters)
+    f.close()
 
 def getPriority(respJson):
     return respJson["fields"]["priority"]["name"]
@@ -49,5 +49,5 @@ def getNumberOfCommenters(respJson):
 
     return len(authors)
 
-url = "https://issues.apache.org/jira/rest/api/latest/issue/ACCUMULO-3?"
+url = "https://issues.apache.org/jira/rest/api/latest/issue/ACCUMULO-"
 parseIssuesToCSV(url)
