@@ -2,25 +2,34 @@ import requests
 from dateutil.parser import parse
 from datetime import timedelta
 
+def writeIssueToFile(file, i):
+    resp = requests.get(url + str(i))
+
+    if resp.status_code != 200:
+        return
+
+    priority = getPriority(resp.json())
+    timeToFix = getTimeToFix(resp.json())
+    numberOfComments = getNumberOfComments(resp.json())
+    numberOfCommenters = getNumberOfCommenters(resp.json())
+
+    print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
+
+def writeAllIssuesToFile(file):
+    i = 1
+    while (True):
+        try:
+            writeIssueToFile(file, i)
+        except BaseException:
+            break
+
+        i += 1
+
 def parseIssuesToCSV(url):
     f = open('jira_data.csv')
     print("id,severity,days_to_close,num_comments,num_commenters\n")
 
-    i = 1
-    while(True):
-        resp = requests.get(url + str(i))
-
-        if resp.status_code != 200:
-            break
-
-        priority = getPriority(resp.json())
-        timeToFix = getTimeToFix(resp.json())
-        numberOfComments = getNumberOfComments(resp.json())
-        numberOfCommenters = getNumberOfCommenters(resp.json())
-
-        print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
-
-        i += 1
+    writeAllIssuesToFile(f)
 
     f.close()
 
