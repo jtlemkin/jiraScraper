@@ -28,7 +28,7 @@ def writeIssueToFile(file, url, i):
     numberOfComments = getNumberOfComments(jiraJson)
     numberOfCommenters = getNumberOfCommenters(jiraJson)
 
-    print("{},{},{},{},{}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
+    print("{0},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
 def writeAllIssuesToFile(file, base_url):
     i = 1
