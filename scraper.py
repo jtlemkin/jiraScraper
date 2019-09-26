@@ -1,6 +1,7 @@
 import requests
 from dateutil.parser import parse
 from datetime import timedelta
+import os
 import json
 
 
@@ -71,13 +72,16 @@ def getNumberOfCommenters(respJson):
 
 def scrape(project):
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
-    fname = project + "_jira.csv"
+
+    os.makedirs(project, exist_ok=True)
+
+    fname = project + "/jira_data.csv"
 
     with open(fname, "a+") as f:
         #this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
             try:
-                with open(project+"_resume", "r") as t:
+                with open(project + "/resume.txt", "r") as t:
                     try:
                         start = int(t.readline())
                     except ValueError:
@@ -104,7 +108,7 @@ def scrape(project):
                     print("issue does not exist, terminating")
                     return
                 finally:
-                    with open(project + "_resume", "w+") as t:
+                    with open(project + "/resume.txt", "w+") as t:
                         t.write(str(line_no))
 
                 line_no += 1
