@@ -10,20 +10,29 @@ class IssueNotExistingError(Exception):
     pass
 
 
-def getJiraJSON(url):
-    resp = requests.get(url)
-
-    if resp.status_code != 200:
-        raise IssueNotExistingError
-
-    #print(json.dumps(resp.json(), indent=4))
-
-    return resp.json()
-
-
-def writeIssueToFile(file, url, i):
+def get_jira_json(project, url, i):
     try:
-        jiraJson = getJiraJSON(url + str(i))
+        with open(project + "/" + str(i) + "_issue.json", "r") as f:
+            jira_json = json.load(f)
+    except FileNotFoundError:
+        resp = requests.get(url + str(i))
+
+        if resp.status_code != 200:
+            raise IssueNotExistingError
+
+        #print(json.dumps(resp.json(), indent=4))
+
+        jira_json = resp.json()
+
+        with open(project + "/" + str(i) + "_issue.json", "w+") as f:
+            json.dump(jira_json, f)
+
+    return jira_json
+
+
+def write_issue_to_file(file, project, url, i):
+    try:
+        jiraJson = get_jira_json(project, url, i)
     except IssueNotExistingError:
         raise
 
@@ -103,7 +112,7 @@ def scrape(project):
 
             while True:
                 try:
-                    writeIssueToFile(f, project_url, line_no)
+                    write_issue_to_file(f, project, project_url, line_no)
                 except IssueNotExistingError:
                     print("issue does not exist, terminating")
                     return
