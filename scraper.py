@@ -3,9 +3,11 @@ from dateutil.parser import parse
 from datetime import timedelta
 import json
 
+
 class IssueNotExistingError(Exception):
     """Raised when the issue does not exist in Jira"""
     pass
+
 
 def getJiraJSON(url):
     resp = requests.get(url)
@@ -17,11 +19,14 @@ def getJiraJSON(url):
 
     return resp.json()
 
+
 def writeIssueToFile(file, url, i):
     try:
         jiraJson = getJiraJSON(url + str(i))
     except IssueNotExistingError:
         raise
+
+    print(i)
 
     priority = getPriority(jiraJson)
     timeToFix = getTimeToFix(jiraJson)
@@ -30,27 +35,10 @@ def writeIssueToFile(file, url, i):
 
     file.write("{0},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
 
-def writeAllIssuesToFile(file, base_url):
-    i = 1
-    while (True):
-        try:
-            writeIssueToFile(file, base_url, i)
-        except IssueNotExistingError:
-            return
-
-        i += 1
-
-def parseIssuesToCSV(base_url):
-    try:
-        f = open('jira_data.csv', "w+")
-        f.write("id,severity,days_to_close,num_comments,num_commenters\n")
-
-        writeAllIssuesToFile(f, base_url)
-    finally:
-        f.close()
 
 def getPriority(respJson):
     return respJson["fields"]["priority"]["name"]
+
 
 def getTimeToFix(respJson):
     if respJson["fields"]["status"]["name"] == "Resolved":
@@ -65,9 +53,11 @@ def getTimeToFix(respJson):
         #-1 indicates that the issue has not been fixed
         return -1
 
+
 def getNumberOfComments(respJson):
     comments = respJson["fields"]["comment"]["comments"]
     return len(comments)
+
 
 def getNumberOfCommenters(respJson):
     authors = set()
@@ -78,5 +68,49 @@ def getNumberOfCommenters(respJson):
 
     return len(authors)
 
-url = "https://issues.apache.org/jira/rest/api/latest/issue/ACCUMULO-"
-parseIssuesToCSV(url)
+
+def scrape(project):
+    base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
+    fname = project + "_jira.csv"
+
+    with open(fname, "a+") as f:
+        #this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
+        def get_start():
+            try:
+                with open(project+"_resume", "r") as t:
+                    try:
+                        start = int(t.readline())
+                    except ValueError:
+                        return 1
+
+                return start
+            except FileNotFoundError:
+                return 1
+
+        start = get_start()
+
+        if start == 1:
+            f.write("issue_id,project_name,severity,days_to_close,num_comments,num_commenters\n")
+
+        project_url = base_url + project + "-"
+
+        def write_all_issues_to_file():
+            line_no = start
+
+            while True:
+                try:
+                    writeIssueToFile(f, project_url, line_no)
+                except IssueNotExistingError:
+                    print("issue does not exist, terminating")
+                    return
+                finally:
+                    with open(project + "_resume", "w+") as t:
+                        t.write(str(line_no))
+
+                line_no += 1
+
+        write_all_issues_to_file()
+
+
+scrape("ACCUMULO")
+
