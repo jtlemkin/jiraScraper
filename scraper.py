@@ -3,6 +3,7 @@ from dateutil.parser import parse
 from datetime import timedelta
 import os
 import json
+import sys
 
 
 class IssueNotExistingError(Exception):
@@ -12,7 +13,7 @@ class IssueNotExistingError(Exception):
 
 def get_jira_json(project, url, i):
     try:
-        with open(project + "/" + str(i) + "_issue.json", "r") as f:
+        with open(project + "/json/" + str(i) + "_issue.json", "r") as f:
             jira_json = json.load(f)
     except FileNotFoundError:
         resp = requests.get(url + str(i))
@@ -24,7 +25,7 @@ def get_jira_json(project, url, i):
 
         jira_json = resp.json()
 
-        with open(project + "/" + str(i) + "_issue.json", "w+") as f:
+        with open(project + "/json/" + str(i) + "_issue.json", "w+") as f:
             json.dump(jira_json, f)
 
     return jira_json
@@ -80,6 +81,8 @@ def getNumberOfCommenters(respJson):
 
 
 def scrape(project):
+    print("PROCESSING " + project)
+
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
 
     os.makedirs(project, exist_ok=True)
@@ -125,5 +128,5 @@ def scrape(project):
         write_all_issues_to_file()
 
 
-scrape("ACCUMULO")
+scrape(sys.argv[1])
 
