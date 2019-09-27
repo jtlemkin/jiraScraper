@@ -140,5 +140,5 @@ def scrape(project):
 
         write_all_issues_to_file()
 
-scrape("OOZIE")
+scrape(sys.argv[1])
 
