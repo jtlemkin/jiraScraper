@@ -47,7 +47,7 @@ def write_issue_to_file(file, project, url, i):
     numberOfComments = getNumberOfComments(jiraJson)
     numberOfCommenters = getNumberOfCommenters(jiraJson)
 
-    file.write("{0},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters))
+    file.write("{0},{5},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters, project))
 
 
 def getPriority(respJson):
