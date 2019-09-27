@@ -2,25 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a8e92f1-7841-411b-8e11-fc07be4150d0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/10_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/11_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/12_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/13_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/14_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/15_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/16_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/17_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/18_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/1_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/2_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/3_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/4_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/5_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/6_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/7_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/8_issue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ACCUMULO/9_issue.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/scraper.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,15 +11,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/jiraScraper$scraper.coverage" NAME="scraper Coverage Results" MODIFIED="1569542767509" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jiraScraper$scraper.coverage" NAME="scraper Coverage Results" MODIFIED="1569545225387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="49" column="124" selection-start-line="49" selection-start-column="124" selection-end-line="49" selection-end-column="124" />
+            <state relative-caret-position="255">
+              <caret line="143" column="17" selection-start-line="143" selection-start-column="17" selection-end-line="143" selection-end-column="17" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -113,23 +94,6 @@
               <item name="jiraScraper" type="b2602c69:ProjectViewProjectNode" />
               <item name="jiraScraper" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="jiraScraper" type="b2602c69:ProjectViewProjectNode" />
-              <item name="jiraScraper" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="jiraScraper" type="b2602c69:ProjectViewProjectNode" />
-              <item name="jiraScraper" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="ACCUMULO" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="jiraScraper" type="b2602c69:ProjectViewProjectNode" />
-              <item name="jiraScraper" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="AMBARI" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -190,12 +154,12 @@
       <updated>1569081230414</updated>
       <workItem from="1569081231861" duration="6744000" />
       <workItem from="1569430123007" duration="5805000" />
-      <workItem from="1569519158149" duration="12962000" />
+      <workItem from="1569519158149" duration="13692000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25511000" />
+    <option name="totallyTimeSpent" value="26241000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -207,16 +171,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="17" y="24" width="1326" height="800" extended-state="0" />
+    <frame x="162" y="23" width="1326" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25778815" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25778815" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32909605" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32909605" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3997175" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3997175" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32909605" />
@@ -224,7 +188,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32909605" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32909605" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32909605" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32909605" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -241,11 +205,35 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/scraper.py</url>
-          <line>126</line>
+          <line>127</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scraper.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="respJson[&quot;fields&quot;][&quot;status&quot;][&quot;name&quot;]" language="Python" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>respJson[&quot;fields&quot;][&quot;status&quot;][&quot;name&quot;]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>respJson[&quot;fields&quot;][&quot;status&quot;]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/dateutil/parser.py">
@@ -365,8 +353,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="49" column="124" selection-start-line="49" selection-start-column="124" selection-end-line="49" selection-end-column="124" />
+        <state relative-caret-position="255">
+          <caret line="143" column="17" selection-start-line="143" selection-start-column="17" selection-end-line="143" selection-end-column="17" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

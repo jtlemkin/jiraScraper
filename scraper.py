@@ -55,7 +55,8 @@ def getPriority(respJson):
 
 
 def getTimeToFix(respJson):
-    if respJson["fields"]["status"]["name"] == "Resolved":
+    status = respJson["fields"]["status"]["name"]
+    if status == "Closed" or status == "Resolved":
         resolutionDate = parse(respJson["fields"]["resolutiondate"])
         creationDate = parse(respJson["fields"]["created"])
 
