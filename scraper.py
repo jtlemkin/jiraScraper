@@ -40,7 +40,7 @@ def write_issue_to_file(file, project, url, i):
     except IssueNotExistingError:
         raise
 
-    print(project + " " + i)
+    print(project + " " + str(i))
 
     priority = getPriority(jiraJson)
     timeToFix = getTimeToFix(jiraJson)
@@ -140,6 +140,6 @@ def scrape(project):
 
         write_all_issues_to_file()
 
-
+scrape("JCR")
 scrape(sys.argv[1])
 
