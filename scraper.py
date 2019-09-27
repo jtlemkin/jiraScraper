@@ -13,20 +13,23 @@ class IssueNotExistingError(Exception):
 
 def get_jira_json(project, url, i):
     try:
-        with open(project + "/json/" + str(i) + "_issue.json", "r") as f:
-            jira_json = json.load(f)
+        f = open("data/" + project + "/json/" + str(i) + "_issue.json", "r")
     except FileNotFoundError:
-        resp = requests.get(url + str(i))
+        issue_url = url + str(i)
+        resp = requests.get(issue_url)
 
         if resp.status_code != 200:
             raise IssueNotExistingError
 
-        #print(json.dumps(resp.json(), indent=4))
+        # print(json.dumps(resp.json(), indent=4))
 
         jira_json = resp.json()
 
-        with open(project + "/json/" + str(i) + "_issue.json", "w+") as f:
+        with open("data/" + project + "/json/" + str(i) + "_issue.json", "w+") as f:
             json.dump(jira_json, f)
+    else:
+        jira_json = json.load(f)
+        f.close()
 
     return jira_json
 
@@ -85,15 +88,15 @@ def scrape(project):
 
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
 
-    os.makedirs(project, exist_ok=True)
+    os.makedirs("data/" + project + "/json", exist_ok=True)
 
-    fname = project + "/jira_data.csv"
+    fname = "data/" + project + "/jira_data.csv"
 
     with open(fname, "a+") as f:
         #this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
             try:
-                with open(project + "/resume.txt", "r") as t:
+                with open("data/" + project + "/resume.txt", "r") as t:
                     try:
                         start = int(t.readline())
                     except ValueError:
@@ -111,22 +114,32 @@ def scrape(project):
         project_url = base_url + project + "-"
 
         def write_all_issues_to_file():
-            line_no = start
+            issue_no = start
+            consecutive_missed = 0
+
+            threshold_for_missed = 10
 
             while True:
                 try:
-                    write_issue_to_file(f, project, project_url, line_no)
+                    consecutive_missed = 0
+                    write_issue_to_file(f, project, project_url, issue_no)
                 except IssueNotExistingError:
-                    print("issue does not exist, terminating")
-                    return
-                finally:
-                    with open(project + "/resume.txt", "w+") as t:
-                        t.write(str(line_no))
+                    consecutive_missed += 1
 
-                line_no += 1
+                    if consecutive_missed < threshold_for_missed:
+                        pass
+                    else:
+                        print("terminating at issue " + issue_no)
+                        return
+                finally:
+                    with open("data/" + project + "/resume.txt", "w+") as t:
+                        t.write(str(issue_no))
+
+                issue_no += 1
 
         write_all_issues_to_file()
 
 
-scrape(sys.argv[1])
+scrape("HADOOP")
+#scrape(sys.argv[1])
 
