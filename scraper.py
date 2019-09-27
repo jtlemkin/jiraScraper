@@ -40,7 +40,7 @@ def write_issue_to_file(file, project, url, i):
     except IssueNotExistingError:
         raise
 
-    print(i)
+    print(project + " " + i)
 
     priority = getPriority(jiraJson)
     timeToFix = getTimeToFix(jiraJson)
