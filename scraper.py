@@ -118,11 +118,10 @@ def scrape(project):
             issue_no = start
             consecutive_missed = 0
 
-            threshold_for_missed = 10
+            threshold_for_missed = 5
 
             while True:
                 try:
-                    consecutive_missed = 0
                     write_issue_to_file(f, project, project_url, issue_no)
                 except IssueNotExistingError:
                     consecutive_missed += 1
@@ -132,6 +131,8 @@ def scrape(project):
                     else:
                         print("terminating at issue " + issue_no)
                         return
+                else:
+                    consecutive_missed = 0
                 finally:
                     with open("data/" + project + "/resume.txt", "w+") as t:
                         t.write(str(issue_no))
@@ -139,6 +140,6 @@ def scrape(project):
                 issue_no += 1
 
         write_all_issues_to_file()
+        print("DONE SCRAPING " + project)
 
 scrape(sys.argv[1])
-
