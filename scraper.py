@@ -56,7 +56,7 @@ def getPriority(respJson):
 
 def getTimeToFix(respJson):
     status = respJson["fields"]["status"]["name"]
-    if status == "Closed" or status == "Resolved":
+    if (status == "Closed" or status == "Resolved") and respJson["fields"]["resolutiondate"]:
         resolutionDate = parse(respJson["fields"]["resolutiondate"])
         creationDate = parse(respJson["fields"]["created"])
 
@@ -140,5 +140,5 @@ def scrape(project):
 
         write_all_issues_to_file()
 
-scrape(sys.argv[1])
+scrape("OOZIE")
 
