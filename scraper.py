@@ -129,7 +129,7 @@ def scrape(project):
                     if consecutive_missed < threshold_for_missed:
                         pass
                     else:
-                        print("terminating at issue " + issue_no)
+                        print("Terminating at issue " + str(issue_no))
                         return
                 else:
                     consecutive_missed = 0
@@ -142,4 +142,4 @@ def scrape(project):
         write_all_issues_to_file()
         print("DONE SCRAPING " + project)
 
-scrape(sys.argv[1])
+scrape("ACCUMULO")
