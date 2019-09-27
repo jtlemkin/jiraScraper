@@ -140,6 +140,5 @@ def scrape(project):
 
         write_all_issues_to_file()
 
-scrape("JCR")
 scrape(sys.argv[1])
 
