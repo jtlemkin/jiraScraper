@@ -34,8 +34,21 @@ def get_jira_json(project, url, i):
     return jira_json
 
 
-def getIssueLinks(jiraJson):
+def get_issue_links(jiraJson):
+    json_issuelinks = jiraJson["fields"]["issuelinks"]
 
+    breaks = "NONE"
+    is_broken_by = "NONE"
+
+    # assumes only one link breaks link and is broken by link per issue
+    for link in json_issuelinks:
+        if "outwardIssue" in link and link["type"]["outward"] == "breaks":
+            breaks = link["outwardIssue"]["key"]
+
+        if "inwardIssue" in link and link["type"]["inward"] == "is broken by":
+            is_broken_by = link["inwardIssue"]["key"]
+
+    return breaks, is_broken_by
 
 
 def write_issue_to_file(file, project, url, i):
@@ -44,18 +57,17 @@ def write_issue_to_file(file, project, url, i):
     except IssueNotExistingError:
         raise
 
-    bug_id = project + "-" + i
+    bug_id = project + "-" + str(i)
     print(bug_id)
 
-    bug_id = project + "-" + i
     priority = getPriority(jiraJson)
-    timeToFix = getTimeToFix(jiraJson)
-    numberOfComments = getNumberOfComments(jiraJson)
-    numberOfCommenters = getNumberOfCommenters(jiraJson)
-    issue_links = getIssueLinks(jiraJson)
+    time_to_fix = getTimeToFix(jiraJson)
+    number_of_comments = getNumberOfComments(jiraJson)
+    number_of_commenters = getNumberOfCommenters(jiraJson)
+    breaks, is_broken_by = get_issue_links(jiraJson)
 
-    file.write("{0},{1},{2:0.3f},{3},{4},{5}\n".format(bug_id, priority, timeToFix, numberOfComments,
-                                                       numberOfCommenters, issue_links))
+    file.write("{0},{1},{2:0.3f},{3},{4},{5},{6}\n".format(bug_id, priority, time_to_fix, number_of_comments,
+                                                           number_of_commenters, breaks, is_broken_by))
 
 
 def getPriority(respJson):
@@ -73,7 +85,7 @@ def getTimeToFix(respJson):
 
         return timeToFixInDays
     else:
-        #-1 indicates that the issue has not been fixed
+        # -1 indicates that the issue has not been fixed
         return -1
 
 
@@ -102,7 +114,7 @@ def scrape(project):
     fname = "data/" + project + "/jira_data.csv"
 
     with open(fname, "a+") as f:
-        #this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
+        # this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
             try:
                 with open("data/" + project + "/resume.txt", "r") as t:
@@ -118,7 +130,7 @@ def scrape(project):
         start = get_start()
 
         if start == 1:
-            f.write("bug_id,severity,days_to_close,num_comments,num_commenters\n")
+            f.write("bug_id,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
 
         project_url = base_url + project + "-"
 
@@ -150,5 +162,6 @@ def scrape(project):
         write_all_issues_to_file()
         print("DONE SCRAPING " + project)
 
-scrape("SOLR")
-#scrape(sys.argv[1])
+
+scrape("ACCUMULO")
+# scrape(sys.argv[1])
