@@ -67,44 +67,44 @@ def write_issue_to_file(file, project, url, i):
     print(bug_id)
 
     issue_type = get_type(jira_json)
-    priority = getPriority(jira_json)
-    time_to_fix = getTimeToFix(jira_json)
-    number_of_comments = getNumberOfComments(jira_json)
-    number_of_commenters = getNumberOfCommenters(jira_json)
+    priority = get_priority(jira_json)
+    time_to_fix = get_time_to_fix(jira_json)
+    number_of_comments = get_number_of_comments(jira_json)
+    number_of_commenters = get_number_of_commenters(jira_json)
     breaks, is_broken_by = get_issue_links(jira_json)
 
     file.write("{0},{7},{1},{2:0.3f},{3},{4},{5},{6}\n".format(bug_id, priority, time_to_fix, number_of_comments,
-                                                           number_of_commenters, breaks, is_broken_by, issue_type))
+                                                               number_of_commenters, breaks, is_broken_by, issue_type))
 
 
-def getPriority(respJson):
-    return respJson["fields"]["priority"]["name"]
+def get_priority(resp_json):
+    return resp_json["fields"]["priority"]["name"]
 
 
-def getTimeToFix(respJson):
-    status = respJson["fields"]["status"]["name"]
-    if (status == "Closed" or status == "Resolved") and respJson["fields"]["resolutiondate"]:
-        resolutionDate = parse(respJson["fields"]["resolutiondate"])
-        creationDate = parse(respJson["fields"]["created"])
+def get_time_to_fix(resp_json):
+    status = resp_json["fields"]["status"]["name"]
+    if (status == "Closed" or status == "Resolved") and resp_json["fields"]["resolutiondate"]:
+        resolution_date = parse(resp_json["fields"]["resolutiondate"])
+        creation_date = parse(resp_json["fields"]["created"])
 
-        timeToFix = resolutionDate - creationDate
-        timeToFixInDays = timeToFix / timedelta(days=1)
+        time_to_fix = resolution_date - creation_date
+        time_to_fix_in_days = time_to_fix / timedelta(days=1)
 
-        return timeToFixInDays
+        return time_to_fix_in_days
     else:
         # -1 indicates that the issue has not been fixed
         return -1
 
 
-def getNumberOfComments(respJson):
-    comments = respJson["fields"]["comment"]["comments"]
+def get_number_of_comments(resp_json):
+    comments = resp_json["fields"]["comment"]["comments"]
     return len(comments)
 
 
-def getNumberOfCommenters(respJson):
+def get_number_of_commenters(resp_json):
     authors = set()
 
-    comments = respJson["fields"]["comment"]["comments"]
+    comments = resp_json["fields"]["comment"]["comments"]
     for comment in comments:
         authors.add(comment["author"]["name"])
 
