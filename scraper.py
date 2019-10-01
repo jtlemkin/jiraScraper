@@ -34,20 +34,28 @@ def get_jira_json(project, url, i):
     return jira_json
 
 
+def getIssueLinks(jiraJson):
+
+
+
 def write_issue_to_file(file, project, url, i):
     try:
         jiraJson = get_jira_json(project, url, i)
     except IssueNotExistingError:
         raise
 
-    print(project + " " + str(i))
+    bug_id = project + "-" + i
+    print(bug_id)
 
+    bug_id = project + "-" + i
     priority = getPriority(jiraJson)
     timeToFix = getTimeToFix(jiraJson)
     numberOfComments = getNumberOfComments(jiraJson)
     numberOfCommenters = getNumberOfCommenters(jiraJson)
+    issue_links = getIssueLinks(jiraJson)
 
-    file.write("{0},{5},{1},{2:0.3f},{3},{4}\n".format(i, priority, timeToFix, numberOfComments, numberOfCommenters, project))
+    file.write("{0},{1},{2:0.3f},{3},{4},{5}\n".format(bug_id, priority, timeToFix, numberOfComments,
+                                                       numberOfCommenters, issue_links))
 
 
 def getPriority(respJson):
@@ -110,7 +118,7 @@ def scrape(project):
         start = get_start()
 
         if start == 1:
-            f.write("issue_id,project_name,severity,days_to_close,num_comments,num_commenters\n")
+            f.write("bug_id,severity,days_to_close,num_comments,num_commenters\n")
 
         project_url = base_url + project + "-"
 
@@ -142,4 +150,5 @@ def scrape(project):
         write_all_issues_to_file()
         print("DONE SCRAPING " + project)
 
-scrape("ACCUMULO")
+scrape("SOLR")
+#scrape(sys.argv[1])
