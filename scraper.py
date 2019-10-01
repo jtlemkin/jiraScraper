@@ -12,8 +12,10 @@ class IssueNotExistingError(Exception):
 
 
 def get_jira_json(project, url, i):
+    json_file_path = "json/" + project + "/" + str(i) + "_issue.json"
+
     try:
-        f = open("data/" + project + "/json/" + str(i) + "_issue.json", "r")
+        f = open(json_file_path, "r")
     except FileNotFoundError:
         issue_url = url + str(i)
         resp = requests.get(issue_url)
@@ -25,7 +27,7 @@ def get_jira_json(project, url, i):
 
         jira_json = resp.json()
 
-        with open("data/" + project + "/json/" + str(i) + "_issue.json", "w+") as f:
+        with open(json_file_path, "w+") as f:
             json.dump(jira_json, f)
     else:
         jira_json = json.load(f)
@@ -114,15 +116,17 @@ def scrape(project):
 
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
 
-    os.makedirs("data/" + project + "/json", exist_ok=True)
+    os.makedirs("json/" + project, exist_ok=True)
+    os.makedirs("csvs/", exist_ok=True)
+    os.makedirs("starts", exist_ok=True)
 
-    fname = "data/" + project + "/jira_data.csv"
+    fname = "csvs/" + project + ".csv"
 
     with open(fname, "a+") as f:
         # this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
             try:
-                with open("data/" + project + "/resume.txt", "r") as t:
+                with open("starts/" + project + "_start.txt", "r") as t:
                     try:
                         start = int(t.readline())
                     except ValueError:
@@ -159,7 +163,7 @@ def scrape(project):
                 else:
                     consecutive_missed = 0
                 finally:
-                    with open("data/" + project + "/resume.txt", "w+") as t:
+                    with open("starts/" + project + "_start.txt", "w+") as t:
                         t.write(str(issue_no))
 
                 issue_no += 1
@@ -168,5 +172,4 @@ def scrape(project):
         print("DONE SCRAPING " + project)
 
 
-scrape("ACCUMULO")
-# scrape(sys.argv[1])
+scrape(sys.argv[1])

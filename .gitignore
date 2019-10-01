@@ -6,3 +6,5 @@ data
 .DS_Store
 *.out
 format_induce_benchmark.py
+json
+starts
