@@ -139,7 +139,7 @@ def scrape(project):
         start = get_start()
 
         if start == 1:
-            f.write("bug_id,type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
+            f.write("bug_id,issue_type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
 
         project_url = base_url + project + "-"
 
@@ -147,7 +147,7 @@ def scrape(project):
             issue_no = start
             consecutive_missed = 0
 
-            threshold_for_missed = 5
+            threshold_for_missed = 20
 
             while True:
                 try:
