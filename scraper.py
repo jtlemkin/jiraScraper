@@ -34,8 +34,8 @@ def get_jira_json(project, url, i):
     return jira_json
 
 
-def get_issue_links(jiraJson):
-    json_issuelinks = jiraJson["fields"]["issuelinks"]
+def get_issue_links(jira_json):
+    json_issuelinks = jira_json["fields"]["issuelinks"]
 
     breaks = "NONE"
     is_broken_by = "NONE"
@@ -51,23 +51,28 @@ def get_issue_links(jiraJson):
     return breaks, is_broken_by
 
 
+def get_type(jira_json):
+    return jira_json["fields"]["issuetype"]["name"]
+
+
 def write_issue_to_file(file, project, url, i):
     try:
-        jiraJson = get_jira_json(project, url, i)
+        jira_json = get_jira_json(project, url, i)
     except IssueNotExistingError:
         raise
 
     bug_id = project + "-" + str(i)
     print(bug_id)
 
-    priority = getPriority(jiraJson)
-    time_to_fix = getTimeToFix(jiraJson)
-    number_of_comments = getNumberOfComments(jiraJson)
-    number_of_commenters = getNumberOfCommenters(jiraJson)
-    breaks, is_broken_by = get_issue_links(jiraJson)
+    issue_type = get_type(jira_json)
+    priority = getPriority(jira_json)
+    time_to_fix = getTimeToFix(jira_json)
+    number_of_comments = getNumberOfComments(jira_json)
+    number_of_commenters = getNumberOfCommenters(jira_json)
+    breaks, is_broken_by = get_issue_links(jira_json)
 
-    file.write("{0},{1},{2:0.3f},{3},{4},{5},{6}\n".format(bug_id, priority, time_to_fix, number_of_comments,
-                                                           number_of_commenters, breaks, is_broken_by))
+    file.write("{0},{7},{1},{2:0.3f},{3},{4},{5},{6}\n".format(bug_id, priority, time_to_fix, number_of_comments,
+                                                           number_of_commenters, breaks, is_broken_by, issue_type))
 
 
 def getPriority(respJson):
