@@ -12,7 +12,7 @@ class IssueNotExistingError(Exception):
 
 
 def get_jira_json(project, url, i):
-    json_file_path = "json/" + project + "/" + str(i) + "_issue.json"
+    json_file_path = "data/json/" + project + "/" + str(i) + "_issue.json"
 
     try:
         f = open(json_file_path, "r")
@@ -116,17 +116,17 @@ def scrape(project):
 
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
 
-    os.makedirs("json/" + project, exist_ok=True)
-    os.makedirs("csvs/", exist_ok=True)
-    os.makedirs("starts", exist_ok=True)
+    os.makedirs("data/json/" + project, exist_ok=True)
+    os.makedirs("data/csvs/", exist_ok=True)
+    os.makedirs("data/starts", exist_ok=True)
 
-    fname = "csvs/" + project + ".csv"
+    fname = "data/csvs/" + project + ".csv"
 
     with open(fname, "a+") as f:
         # this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
             try:
-                with open("starts/" + project + "_start.txt", "r") as t:
+                with open("data/starts/" + project + "_start.txt", "r") as t:
                     try:
                         start = int(t.readline())
                     except ValueError:
@@ -163,7 +163,7 @@ def scrape(project):
                 else:
                     consecutive_missed = 0
                 finally:
-                    with open("starts/" + project + "_start.txt", "w+") as t:
+                    with open("data/starts/" + project + "_start.txt", "w+") as t:
                         t.write(str(issue_no))
 
                 issue_no += 1
