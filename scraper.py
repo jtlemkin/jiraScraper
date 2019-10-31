@@ -4,6 +4,7 @@ from datetime import timedelta
 import os
 import json
 import sys
+import pygit2
 
 
 class IssueNotExistingError(Exception):
@@ -126,6 +127,8 @@ def scrape(project, task):
 
     fname = "data/csvs/" + project + ".csv"
 
+    repo = pygit2.Repository("../apache/" + project.lower())
+
     with open(fname, "a+") as f:
         # this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
         def get_start():
@@ -155,7 +158,8 @@ def scrape(project, task):
 
             while True:
                 try:
-                    task(f, project, project_url, issue_no)
+                    #task(f, project, project_url, issue_no)
+                    task(f, project, issue_no, repo)
                 except IssueNotExistingError:
                     consecutive_missed += 1
 
@@ -175,4 +179,40 @@ def scrape(project, task):
         write_all_issues_to_file()
 
 
-scrape(sys.argv[1], write_issue_to_file)
+def get_issue_commits(repo, project, issue_no):
+    last = repo[repo.head.target]
+
+    project_id = project + "-" + str(issue_no) + " "
+
+    commits = []
+
+    found_match = False
+    num_commits_since_match = 0
+
+    for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
+        if project_id in commit.message:
+            commits.append(commit)
+
+        # This makes the assumption that commits pertaining to the same issue are not too far away
+        if found_match:
+            num_commits_since_match += 1
+
+        if num_commits_since_match > 100:
+            break
+
+    return commits
+
+
+def write_issue_commits_to_file(f, project, issue_no, repo):
+    commits = get_issue_commits(repo, project, issue_no)
+    pass
+
+
+#scrape(sys.argv[1], write_issue_to_file)
+#TODO
+#change this back!
+#scrape("ACCUMULO", write_issue_commits_to_file)
+
+repo = pygit2.Repository("../apache/" + "accumulo")
+
+write_issue_commits_to_file(None, "ACCUMULO", 3580, repo)
