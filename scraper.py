@@ -111,14 +111,18 @@ def get_number_of_commenters(resp_json):
     return len(authors)
 
 
-def scrape(project):
+def create_dirs(project):
+    os.makedirs("data/json/" + project, exist_ok=True)
+    os.makedirs("data/csvs/", exist_ok=True)
+    os.makedirs("data/starts", exist_ok=True)
+
+
+def scrape(project, task):
     print("PROCESSING " + project)
 
     base_url = "https://issues.apache.org/jira/rest/api/latest/issue/"
 
-    os.makedirs("data/json/" + project, exist_ok=True)
-    os.makedirs("data/csvs/", exist_ok=True)
-    os.makedirs("data/starts", exist_ok=True)
+    create_dirs(project)
 
     fname = "data/csvs/" + project + ".csv"
 
@@ -151,7 +155,7 @@ def scrape(project):
 
             while True:
                 try:
-                    write_issue_to_file(f, project, project_url, issue_no)
+                    task(f, project, project_url, issue_no)
                 except IssueNotExistingError:
                     consecutive_missed += 1
 
@@ -171,4 +175,4 @@ def scrape(project):
         write_all_issues_to_file()
 
 
-scrape(sys.argv[1])
+scrape(sys.argv[1], write_issue_to_file)
