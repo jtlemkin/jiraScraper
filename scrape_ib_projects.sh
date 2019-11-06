@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-projects=("ACCUMULO" "AMBARI" "HADOOP" "JCR" "LUCENE" "OOZIE" "SOLR")
+projects=("ACCUMULO" "AMBARI" "HADOOP" "JCR" "LUCENE" "OOZIE")
 
 for project in "${projects[@]}"
 do

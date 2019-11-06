@@ -5,7 +5,9 @@ import os
 import json
 import sys
 import pygit2
-
+from datetime import datetime
+import cProfile
+import csv
 
 class IssueNotExistingError(Exception):
     """Raised when the issue does not exist in Jira"""
@@ -125,9 +127,18 @@ def scrape(project, task):
 
     create_dirs(project)
 
-    fname = "data/csvs/" + project + ".csv"
+    #fname = "data/csvs/" + project + ".csv"
+    fname = "data/csvs/" + project + "_commits.csv"
 
     repo = pygit2.Repository("../apache/" + project.lower())
+
+    ranges = {"ACCUMULO" : range(2460,4675),
+              "AMBARI" : range(6271,22780),
+              "HADOOP" : range(6243,13891),
+              "JCR" : range(892, 4119),
+              "LUCENE" : range(701, 11184),
+              "OOZIE": range(609, 3316)
+              }
 
     with open(fname, "a+") as f:
         # this isn't a good method but shouldn't be too much of an issue because the file shouldn't get too large
@@ -146,9 +157,11 @@ def scrape(project, task):
         start = get_start()
 
         if start == 1:
-            f.write("bug_id,issue_type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
+            #f.write("bug_id,issue_type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
+            f.write("sha,bug_id,num_files,file_types,avg_line_age,num_owners\n")
+            start = ranges[project].start
 
-        project_url = base_url + project + "-"
+        issues = get_linked_issues(project)
 
         def write_all_issues_to_file():
             issue_no = start
@@ -156,7 +169,11 @@ def scrape(project, task):
 
             threshold_for_missed = 20
 
-            while True:
+            while issue_no < ranges[project].stop:
+                if issue_no not in issues:
+                    issue_no += 1
+                    continue
+
                 try:
                     #task(f, project, project_url, issue_no)
                     task(f, project, issue_no, repo)
@@ -205,14 +222,70 @@ def get_issue_commits(repo, project, issue_no):
 
 def write_issue_commits_to_file(f, project, issue_no, repo):
     commits = get_issue_commits(repo, project, issue_no)
-    pass
+
+    bug_id = project + "-" + str(issue_no)
+
+    print("ISSUE NUMBER", issue_no)
+
+    for commit in commits:
+        diff = repo.diff(commit.parents[0], commit, context_lines=0)
+
+        num_files_changed = diff.stats.files_changed
+        kinds_of_files = set()
+        sum_age_of_lines = 0
+        num_lines = 0
+        owners = set()
+
+        for patch in diff:
+            old_file = patch.delta.old_file.path
+            kinds_of_files.add(old_file.split('.')[-1])
+
+            print(datetime.now())
+
+            for hunk in patch.hunks:
+                if hunk.old_lines:
+
+                    num_lines += hunk.old_lines
+
+                    blame = repo.blame(old_file, newest_commit=commit.parents[0].hex, min_line=hunk.old_start,
+                                           max_line=hunk.old_start + hunk.old_lines - 1, flags=pygit2.GIT_BLAME_NORMAL)
+
+                    for bh in blame:
+                        blamed_sha = bh.final_commit_id.hex
+                        print("blamed_sha", blamed_sha)
+
+                        blamed_commit = repo.revparse_single(blamed_sha)
+
+                        age_of_line = commit.commit_time - blamed_commit.commit_time
+                        sum_age_of_lines += age_of_line
+                        owners.add(blamed_commit.committer.name)
+
+                        print(datetime.now())
+
+        if num_lines == 0:
+            continue
+
+        avg_age_of_lines = sum_age_of_lines / num_lines
+
+        file_types = ' '.join(kinds_of_files)
+
+        f.write("{},{},{},{},{},{}\n".format(commit.hex, bug_id, num_files_changed, file_types, avg_age_of_lines,
+                                             len(owners)))
+
+
+def get_linked_issues(project):
+    with open('../InduceBenchmark/' + project + '.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter='\t')
+
+        issues = set()
+
+        next(csv_reader)
+
+        for row in csv_reader:
+            issues.add(int(row[0].split('-')[-1]))
+
+        return issues
 
 
 #scrape(sys.argv[1], write_issue_to_file)
-#TODO
-#change this back!
-#scrape("ACCUMULO", write_issue_commits_to_file)
-
-repo = pygit2.Repository("../apache/" + "accumulo")
-
-write_issue_commits_to_file(None, "ACCUMULO", 3580, repo)
+scrape(sys.argv[1], write_issue_commits_to_file)
