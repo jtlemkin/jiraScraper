@@ -166,7 +166,8 @@ def scrape(project, task):
         issue_no = 0
 
         def write_all_issues_to_file():
-            nonlocal issue_no = start
+            nonlocal issue_no
+            issue_no = start
             consecutive_missed = 0
 
             threshold_for_missed = 20
