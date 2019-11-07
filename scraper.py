@@ -163,8 +163,10 @@ def scrape(project, task):
 
         issues = get_linked_issues(project)
 
+        issue_no = 0
+
         def write_all_issues_to_file():
-            issue_no = start
+            nonlocal issue_no = start
             consecutive_missed = 0
 
             threshold_for_missed = 20
@@ -194,6 +196,8 @@ def scrape(project, task):
                 issue_no += 1
 
         write_all_issues_to_file()
+
+    print("Done scraping", project, "at", issue_no, "\n")
 
 
 def get_issue_commits(repo, project, issue_no):
