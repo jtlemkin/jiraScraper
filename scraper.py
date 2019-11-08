@@ -224,9 +224,10 @@ def write_issue_commits_to_file(f, project, issue_no, repo):
 
     bug_id = project + "-" + str(issue_no)
 
-    print("ISSUE NUMBER", issue_no)
+    print(project, "ISSUE NUMBER", issue_no)
 
     for commit in commits:
+
         diff = repo.diff(commit.parents[0], commit, context_lines=0)
 
         num_files_changed = diff.stats.files_changed
@@ -272,19 +273,121 @@ def write_issue_commits_to_file(f, project, issue_no, repo):
                                              len(owners)))
 
 
-def get_linked_issues(project):
-    with open('../InduceBenchmark/' + project + '.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter='\t')
+class CommitData:
+    def __init__(self, num_files_changed, files_types, avg_age_of_lines, owners, files):
+        self.num_files_changed = num_files_changed
+        self.files_types = files_types
+        self.avg_age_of_lines = avg_age_of_lines
+        self.owners = owners
+        self.files = files
 
-        issues = set()
 
-        next(csv_reader)
+def get_commit_data(shas, repo):
+    commit_data = {}
 
-        for row in csv_reader:
-            issues.add(int(row[0].split('-')[-1]))
+    for sha in shas:
+        commit = repo.revparse_single(sha)
 
-        return issues
+        diff = repo.diff(commit.parents[0], commit, context_lines=0)
+
+        num_files_changed = diff.stats.files_changed
+        kinds_of_files = set()
+        sum_age_of_lines = 0
+        num_lines = 0
+        owners = set()
+        files = set()
+
+        for patch in diff:
+            old_file = patch.delta.old_file.path
+            kinds_of_files.add(old_file.split('.')[-1])
+            files.add(old_file)
+
+            print(datetime.now())
+
+            for hunk in patch.hunks:
+                if hunk.old_lines:
+
+                    num_lines += hunk.old_lines
+
+                    blame = repo.blame(old_file, newest_commit=commit.parents[0].hex, min_line=hunk.old_start,
+                                       max_line=hunk.old_start + hunk.old_lines - 1,
+                                       flags=pygit2.GIT_BLAME_NORMAL)
+
+                    for bh in blame:
+                        blamed_sha = bh.final_commit_id.hex
+                        print("blamed_sha", blamed_sha)
+
+                        blamed_commit = repo.revparse_single(blamed_sha)
+
+                        age_of_line = commit.commit_time - blamed_commit.commit_time
+                        sum_age_of_lines += age_of_line
+                        owners.add(blamed_commit.committer.name)
+
+                        print(datetime.now())
+
+        if num_lines == 0:
+            continue
+
+        avg_age_of_lines = sum_age_of_lines / num_lines
+
+        file_types = ' '.join(kinds_of_files)
+
+        commit_data[commit.hex] = CommitData(num_files_changed, file_types, avg_age_of_lines, owners, files)
+
+    return commit_data
+
+
+def get_bug_files(shas, commit_data):
+    files = set()
+
+    for sha in shas:
+        files.union(commit_data[sha].files)
+
+    return files
+
+
+def get_szz_assumptions(project):
+    print("PROCESSING " + project)
+
+    create_dirs(project)
+
+    fname = "data/csvs/" + project + "_assumptions.csv"
+
+    repo = pygit2.Repository("../apache/" + project.lower())
+
+    with open(fname, "a+") as f:
+        with open('../InduceBenchmark/' + project + '.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter='\t')
+
+            issues = set()
+
+            next(csv_reader)
+
+            for row in csv_reader:
+                fixes = row[1].split(',')
+                bugs = row[2].split(',')
+
+                commit_data = get_commit_data(fixes + bugs, repo)
+
+                bug_files = get_bug_files(bugs, commit_data)
+
+                for sha in fixes:
+                    commit = commit_data[sha]
+                    if commit.files.intersection(bug_files):
+                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.file_types,
+                                                             commit.avg_age_of_lines, len(commit.owners), 1))
+                    else:
+                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.file_types,
+                                                            commit.avg_age_of_lines, len(commit.owners), 0))
+
+            return issues
+
+
 
 
 #scrape(sys.argv[1], write_issue_to_file)
-scrape(sys.argv[1], write_issue_commits_to_file)
+
+if (sys.argv[2] == 'd'):
+    scrape(sys.argv[1], write_issue_commits_to_file)
+else:
+    get_szz_assumptions(sys.argv[1])
