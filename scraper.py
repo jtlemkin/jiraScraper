@@ -353,10 +353,10 @@ def get_szz_assumptions(project):
 
     fname = "data/csvs/" + project + "_assumptions.csv"
 
-    repo = pygit2.Repository("../apache/" + project.lower())
+    repo = pygit2.Repository("../../apache/" + project.lower())
 
     with open(fname, "a+") as f:
-        with open('../InduceBenchmark/' + project + '.csv') as csv_file:
+        with open('../../InduceBenchmark/' + project + '.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
 
             issues = set()
