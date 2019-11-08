@@ -252,15 +252,12 @@ def write_issue_commits_to_file(f, project, issue_no, repo):
 
                     for bh in blame:
                         blamed_sha = bh.final_commit_id.hex
-                        print("blamed_sha", blamed_sha)
 
                         blamed_commit = repo.revparse_single(blamed_sha)
 
                         age_of_line = commit.commit_time - blamed_commit.commit_time
                         sum_age_of_lines += age_of_line
                         owners.add(blamed_commit.committer.name)
-
-                        print(datetime.now())
 
         if num_lines == 0:
             continue
@@ -378,6 +375,8 @@ def get_szz_assumptions(project):
                         commit = commit_data[sha]
                     except:
                         continue
+
+                    print(datetime.now(), "Writing", sha, "to csv\n")
 
                     if commit.files.intersection(bug_files):
                         f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
