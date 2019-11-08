@@ -161,8 +161,6 @@ def scrape(project, task):
             f.write("sha,bug_id,num_files,file_types,avg_line_age,num_owners\n")
             start = ranges[project].start
 
-        issues = get_linked_issues(project)
-
         issue_no = 0
 
         def write_all_issues_to_file():
@@ -173,10 +171,6 @@ def scrape(project, task):
             threshold_for_missed = 20
 
             while issue_no < ranges[project].stop:
-                if issue_no not in issues:
-                    issue_no += 1
-                    continue
-
                 try:
                     #task(f, project, project_url, issue_no)
                     task(f, project, issue_no, repo)
