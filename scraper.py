@@ -374,10 +374,10 @@ def get_szz_assumptions(project):
                 for sha in fixes:
                     commit = commit_data[sha]
                     if commit.files.intersection(bug_files):
-                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.file_types,
+                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
                                                              commit.avg_age_of_lines, len(commit.owners), 1))
                     else:
-                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.file_types,
+                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
                                                             commit.avg_age_of_lines, len(commit.owners), 0))
 
             return issues
