@@ -332,7 +332,7 @@ def get_commit_data(shas, repo):
 
         file_types = ' '.join(kinds_of_files)
 
-        commit_data[commit.hex] = CommitData(num_files_changed, file_types, avg_age_of_lines, owners, files)
+        commit_data[sha] = CommitData(num_files_changed, file_types, avg_age_of_lines, owners, files)
 
     return commit_data
 
