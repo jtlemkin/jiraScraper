@@ -353,10 +353,10 @@ def get_szz_assumptions(project):
 
     fname = "data/csvs/" + project + "_assumptions.csv"
 
-    repo = pygit2.Repository("../apache/" + project.lower())
+    repo = pygit2.Repository("../../apache/" + project.lower())
 
     with open(fname, "a+") as f:
-        with open('../InduceBenchmark/' + project + '.csv') as csv_file:
+        with open('../../InduceBenchmark/' + project + '.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
 
             issues = set()
@@ -367,12 +367,18 @@ def get_szz_assumptions(project):
                 fixes = row[1].split(',')
                 bugs = row[2].split(',')
 
+                t = fixes + bugs
+
                 commit_data = get_commit_data(fixes + bugs, repo)
 
                 bug_files = get_bug_files(bugs, commit_data)
 
                 for sha in fixes:
-                    commit = commit_data[sha]
+                    try:
+                        commit = commit_data[sha]
+                    except:
+                        continue
+
                     if commit.files.intersection(bug_files):
                         f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
                                                              commit.avg_age_of_lines, len(commit.owners), 1))
