@@ -283,7 +283,11 @@ def get_commit_data(shas, repo):
     commit_data = {}
 
     for sha in shas:
-        commit = repo.revparse_single(sha)
+        try:
+            commit = repo.revparse_single(sha)
+        except KeyError:
+            print("Skipping sha", sha, "\n");
+            continue
 
         diff = repo.diff(commit.parents[0], commit, context_lines=0)
 
@@ -333,7 +337,10 @@ def get_bug_files(shas, commit_data):
     files = set()
 
     for sha in shas:
-        files.union(commit_data[sha].files)
+        try:
+            files.union(commit_data[sha].files)
+        except KeyError:
+            continue
 
     return files
 
