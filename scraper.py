@@ -9,6 +9,7 @@ from datetime import datetime
 import cProfile
 import csv
 
+
 class IssueNotExistingError(Exception):
     """Raised when the issue does not exist in Jira"""
     pass
@@ -127,16 +128,16 @@ def scrape(project, task):
 
     create_dirs(project)
 
-    #fname = "data/csvs/" + project + ".csv"
+    # fname = "data/csvs/" + project + ".csv"
     fname = "data/csvs/" + project + "_commits.csv"
 
     repo = pygit2.Repository("../apache/" + project.lower())
 
-    ranges = {"ACCUMULO" : range(2460,4675),
-              "AMBARI" : range(6271,22780),
-              "HADOOP" : range(6243,13891),
-              "JCR" : range(892, 4119),
-              "LUCENE" : range(701, 11184),
+    ranges = {"ACCUMULO": range(2460, 4675),
+              "AMBARI": range(6271, 22780),
+              "HADOOP": range(6243, 13891),
+              "JCR": range(892, 4119),
+              "LUCENE": range(701, 11184),
               "OOZIE": range(609, 3316)
               }
 
@@ -157,7 +158,7 @@ def scrape(project, task):
         start = get_start()
 
         if start == 1:
-            #f.write("bug_id,issue_type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
+            # f.write("bug_id,issue_type,severity,days_to_close,num_comments,num_commenters,breaks,is_broken_by\n")
             f.write("sha,bug_id,num_files,file_types,avg_line_age,num_owners\n")
             start = ranges[project].start
 
@@ -172,7 +173,7 @@ def scrape(project, task):
 
             while issue_no < ranges[project].stop:
                 try:
-                    #task(f, project, project_url, issue_no)
+                    # task(f, project, project_url, issue_no)
                     task(f, project, issue_no, repo)
                 except IssueNotExistingError:
                     consecutive_missed += 1
@@ -224,7 +225,7 @@ def write_issue_commits_to_file(f, project, issue_no, repo):
 
     bug_id = project + "-" + str(issue_no)
 
-    print(project, "ISSUE NUMBER", issue_no)
+    print(project, "ISSUE NUMBER", issue_no, "\n")
 
     for commit in commits:
 
@@ -248,7 +249,7 @@ def write_issue_commits_to_file(f, project, issue_no, repo):
                     num_lines += hunk.old_lines
 
                     blame = repo.blame(old_file, newest_commit=commit.parents[0].hex, min_line=hunk.old_start,
-                                           max_line=hunk.old_start + hunk.old_lines - 1, flags=pygit2.GIT_BLAME_NORMAL)
+                                       max_line=hunk.old_start + hunk.old_lines - 1, flags=pygit2.GIT_BLAME_NORMAL)
 
                     for bh in blame:
                         blamed_sha = bh.final_commit_id.hex
@@ -299,8 +300,6 @@ def get_commit_data(shas, repo):
             kinds_of_files.add(old_file.split('.')[-1])
             files.add(old_file)
 
-            print(datetime.now())
-
             for hunk in patch.hunks:
                 if hunk.old_lines:
 
@@ -312,15 +311,12 @@ def get_commit_data(shas, repo):
 
                     for bh in blame:
                         blamed_sha = bh.final_commit_id.hex
-                        print("blamed_sha", blamed_sha)
 
                         blamed_commit = repo.revparse_single(blamed_sha)
 
                         age_of_line = commit.commit_time - blamed_commit.commit_time
                         sum_age_of_lines += age_of_line
                         owners.add(blamed_commit.committer.name)
-
-                        print(datetime.now())
 
         if num_lines == 0:
             continue
@@ -344,16 +340,16 @@ def get_bug_files(shas, commit_data):
 
 
 def get_szz_assumptions(project):
-    print("PROCESSING " + project)
+    print("PROCESSING " + project + "\n")
 
     create_dirs(project)
 
     fname = "data/csvs/" + project + "_assumptions.csv"
 
-    repo = pygit2.Repository("../../apache/" + project.lower())
+    repo = pygit2.Repository("../apache/" + project.lower())
 
     with open(fname, "a+") as f:
-        with open('../../InduceBenchmark/' + project + '.csv') as csv_file:
+        with open('../InduceBenchmark/' + project + '.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
 
             issues = set()
@@ -364,35 +360,33 @@ def get_szz_assumptions(project):
                 fixes = row[1].split(',')
                 bugs = row[2].split(',')
 
-                t = fixes + bugs
-
                 commit_data = get_commit_data(fixes + bugs, repo)
 
                 bug_files = get_bug_files(bugs, commit_data)
 
                 for sha in fixes:
-                    try:
-                        commit = commit_data[sha]
-                    except:
-                        continue
+                    commit = commit_data[sha]
 
                     print(datetime.now(), "Writing", sha, "to csv\n")
 
                     if commit.files.intersection(bug_files):
-                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
-                                                             commit.avg_age_of_lines, len(commit.owners), 1))
+                        f.write(
+                            "{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
+                                                            commit.avg_age_of_lines, len(commit.owners), 1))
                     else:
-                        f.write("{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
+                        f.write(
+                            "{},{},{},{},{},{},{}\n".format(sha, row[0], commit.num_files_changed, commit.files_types,
                                                             commit.avg_age_of_lines, len(commit.owners), 0))
+
+            print("Finished processing", project, "\n")
 
             return issues
 
 
+# scrape(sys.argv[1], write_issue_to_file)
 
 
-#scrape(sys.argv[1], write_issue_to_file)
-
-if (sys.argv[2] == 'd'):
+if sys.argv[2] == 'd':
     scrape(sys.argv[1], write_issue_commits_to_file)
 else:
     get_szz_assumptions(sys.argv[1])
