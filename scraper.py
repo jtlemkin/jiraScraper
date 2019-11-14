@@ -338,7 +338,7 @@ def get_bug_files(shas, commit_data):
 
     for sha in shas:
         try:
-            files.union(commit_data[sha].files)
+            files = files.union(commit_data[sha].files)
         except KeyError:
             continue
 
@@ -352,10 +352,10 @@ def get_szz_assumptions(project):
 
     fname = "data/csvs/" + project + "_assumptions.csv"
 
-    repo = pygit2.Repository("../../apache/" + project.lower())
+    repo = pygit2.Repository("../apache/" + project.lower())
 
     with open(fname, "a+") as f:
-        with open('../../InduceBenchmark/' + project + '.csv') as csv_file:
+        with open('../InduceBenchmark/' + project + '.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
 
             issues = set()
